@@ -11,14 +11,11 @@ import paho.mqtt.client as mqtt
 def decode_unpack(data_m0, meter0_map):
     map_x = {}
     for reg in meter0_map:
-        # print(reg)
         if reg.get('used', False) != False:
-            print(reg)
             key = reg.get('name',0)
             if reg.get('type') == "UINT16":
                 value = data_m0.decode_16bit_uint()
             elif reg.get('type') == "UINT32":
-                # print(dataM0.decode_string(size=4))
                 value = data_m0.decode_32bit_uint()
             elif reg.get('type') == "SINT16":
                 value = data_m0.decode_16bit_int()                
@@ -29,10 +26,8 @@ def decode_unpack(data_m0, meter0_map):
                 data_m0.skip_bytes(2)
             # map_x.append({"key": key, "value": value})
             map_x[key] = value
-            print(value)
         else:
             data_m0.skip_bytes(2)
-    # print(readingM0)
     return map_x
 
 
@@ -208,15 +203,10 @@ while True:
         else:
             values_m0['computed_inverter_efficiency'] = 0
 
-    # except:
-    #     print("failed to write MQTT")
-
     # write mqtt
-        print(mapM0)
         print("trying to write mqtt")
     # try:
         for key, value in values_m0.items():
-            print(f"{key}: {value}")
             mqttClient.publish(topic=f"solaredge-mqtt/meter0/{key}", payload=value)
     # except:
     #     print("failed to write MQTT")
@@ -243,10 +233,8 @@ while True:
         # values_m1["m1_ac_apparent_energy_imported"] = round(mapM1["m1_ac_apparent_energy_imported"] * (10 ** mapM1["m1_ac_apparent_energy_scalefactor"]),2)
 
         # write mqtt
-        print(mapM1)
         # try:
         for key, value in values_m1.items():
-            print(f"{key}: {value}")
             mqttClient.publish(topic=f"solaredge-mqtt/meter1/{key}", payload=value)
     except:
         print("failed to write MQTT")
