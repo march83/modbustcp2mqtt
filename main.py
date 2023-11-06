@@ -20,7 +20,7 @@ def decode_unpack(data_m0, meter0_map):
             elif reg.get('type') == "SINT16":
                 value = data_m0.decode_16bit_int()                
             elif reg.get('type') == "PRINT":
-                print(data_m0.decode_string(size=2))                
+                print(data_m0.decode_string(size=2), flush=True)                
             else:
                 value = -99
                 data_m0.skip_bytes(2)
@@ -172,12 +172,12 @@ while True:
     # read modbus
 
     try:
-        print("trying to read modbus")        
+        print("trying to read modbus", flush=True)
         readingM0 = mbClient.read_holding_registers(mbM0Register, mbM0Length)
         dataM0 = BinaryPayloadDecoder.fromRegisters(readingM0, byteorder=Endian.Big, wordorder=Endian.Big)
         mapM0 = decode_unpack(dataM0, meter0map)
 
-        print("trying to read M1")
+        print("trying to read M1", flush=True)
         readingM1 = mbClient.read_holding_registers(mbM1Register, mbM1Length)
         dataM1 = BinaryPayloadDecoder.fromRegisters(readingM1, byteorder=Endian.Big, wordorder=Endian.Big)
         mapM1 = decode_unpack(dataM1, meter1map)
@@ -205,12 +205,12 @@ while True:
             values_m0['computed_inverter_efficiency'] = 0
 
     # write mqtt
-        print("trying to write mqtt")
+        print("trying to write mqtt", flush=True)
     # try:
         for key, value in values_m0.items():
             mqttClient.publish(topic=f"solaredge-mqtt/meter0/{key}", payload=value)
     # except:
-    #     print("failed to write MQTT")
+    #     print("failed to write MQTT", flush=True)
 
 
 
@@ -238,7 +238,7 @@ while True:
         for key, value in values_m1.items():
             mqttClient.publish(topic=f"solaredge-mqtt/meter1/{key}", payload=value)
     except:
-        print("failed to write MQTT")
+        print("failed to write MQTT", flush=True)
 
     sleepTime = nextTime - datetime.now()
     sleeptime = sleepTime if sleepTime > timedelta(seconds=0) else timedelta(seconds = 0)
