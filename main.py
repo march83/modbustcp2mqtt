@@ -172,17 +172,12 @@ while True:
     # read modbus
 
     try:
-        print("trying to read modbus", flush=True)
+        print("trying to read modbus M0", flush=True)
         readingM0 = mbClient.read_holding_registers(mbM0Register, mbM0Length)
         dataM0 = BinaryPayloadDecoder.fromRegisters(readingM0, byteorder=Endian.Big, wordorder=Endian.Big)
         mapM0 = decode_unpack(dataM0, meter0map)
 
-        print("trying to read M1", flush=True)
-        readingM1 = mbClient.read_holding_registers(mbM1Register, mbM1Length)
-        dataM1 = BinaryPayloadDecoder.fromRegisters(readingM1, byteorder=Endian.Big, wordorder=Endian.Big)
-        mapM1 = decode_unpack(dataM1, meter1map)
-
-
+        # mapping meter M0
         values_m0 = {}
         values_m0["ac_total_current"] = round(mapM0["ac_total_current"] * (10 ** mapM0["ac_current_scalefactor"]),2)
         values_m0["ac_current_phase_a"] = round(mapM0["ac_current_phase_a"] * (10 ** mapM0["ac_current_scalefactor"]),2)
@@ -204,17 +199,20 @@ while True:
         else:
             values_m0['computed_inverter_efficiency'] = 0
 
-    # write mqtt
-        print("trying to write mqtt", flush=True)
-    # try:
+        # write mqtt
+        print("trying to write M0 to mqtt", flush=True)
         for key, value in values_m0.items():
             mqttClient.publish(topic=f"solaredge-mqtt/meter0/{key}", payload=value)
-    # except:
-    #     print("failed to write MQTT", flush=True)
 
+    except Exception as e:
+        print("failed in modbus M0", flush=True)
+        print(e, flush=True)
 
-
-
+    try:
+        print("trying to read modbus M1", flush=True)
+        readingM1 = mbClient.read_holding_registers(mbM1Register, mbM1Length)
+        dataM1 = BinaryPayloadDecoder.fromRegisters(readingM1, byteorder=Endian.Big, wordorder=Endian.Big)
+        mapM1 = decode_unpack(dataM1, meter1map)
 
         values_m1 = {}
         values_m1["m1_ac_current"] = round(mapM1["m1_ac_current"] * (10 ** mapM1["m1_ac_current_scalefactor"]),2)
@@ -237,8 +235,10 @@ while True:
         # try:
         for key, value in values_m1.items():
             mqttClient.publish(topic=f"solaredge-mqtt/meter1/{key}", payload=value)
-    except:
-        print("failed to write MQTT", flush=True)
+
+    except Exception as e:
+        print("failed in modbus M1", flush=True)
+        print(e, flush=True)
 
     sleepTime = nextTime - datetime.now()
     sleeptime = sleepTime if sleepTime > timedelta(seconds=0) else timedelta(seconds = 0)
