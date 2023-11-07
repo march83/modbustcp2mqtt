@@ -240,7 +240,11 @@ while True:
         print("failed in modbus M1", flush=True)
         print(e, flush=True)
 
+    if datetime.now() > nextTime:
+        print("skipping sleep", flush=True)
+        continue
+
     sleepTime = nextTime - datetime.now()
-    sleeptime = sleepTime if sleepTime > timedelta(seconds=0) else timedelta(seconds = 0)
-    print(f"sleeping for {sleepTime}")
+    # sleeptime = sleepTime if sleepTime > timedelta(seconds=0) else timedelta(seconds = 0)
+    print(f"sleeping for {sleepTime}", flush=True)
     time.sleep(round(sleepTime.seconds, 0))
