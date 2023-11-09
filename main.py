@@ -156,8 +156,8 @@ mbM0Register = 40069
 mbM0Length = 39
 mbM1Register = 40188
 mbM1Length = 105
-# mbClient = ModbusClient(host=mbHost, port=mbPort, debug=True, auto_open=True)
-mbClient = ModbusClient(host=mbHost, port=mbPort, debug=False, auto_open=True)
+mbClient = ModbusClient(host=mbHost, port=mbPort, debug=True, auto_open=True)
+# mbClient = ModbusClient(host=mbHost, port=mbPort, debug=False, auto_open=True)
 mbPollRate = 5
 
 # define mqtt connection
